@@ -9,6 +9,16 @@ terrain.add_object(rover, 3, 3)
 
 terrain.display()
 while True:
-	direction = input("> ")
-	rover.move(direction)
-	terrain.display()
+	inp = input("> ")
+
+	if inp is "":
+		pass
+
+	elif inp in ["o", "observe"]:
+		terrain.display()
+
+	elif inp in ["exit", "quit"]:
+		break
+
+	else:
+		rover.move(inp)
