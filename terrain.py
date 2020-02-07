@@ -29,18 +29,3 @@ class Terrain:
 		obj.x = None
 		obj.y = None
 		obj.terrain = None
-
-
-	def display(self):
-		# Displays whole map
-		for row in range(self.height):
-			for col in range(self.width):
-
-				objs = self.map[row][col]
-				if any([isinstance(obj, Rover) for obj in objs]):
-					print("X ", end="")
-
-				else:
-					print("- ", end="")
-
-			print("")

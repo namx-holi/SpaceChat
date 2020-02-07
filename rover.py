@@ -1,5 +1,6 @@
 
 from movable_object import MovableObject
+from note import Note
 
 
 class Rover(MovableObject):
@@ -26,9 +27,17 @@ class Rover(MovableObject):
 				if any([isinstance(obj, Rover) for obj in objs]):
 					s += "X "
 
+				elif any([isinstance(obj, Note) for obj in objs]):
+					s += "M "
+
 				else:
 					s += "- "
 
 			s += "\n"
 
 		return s.rstrip()
+
+
+	def drop_note(self, msg):
+		note = Note(msg)
+		self.terrain.add_object(note, self.x, self.y)

@@ -8,6 +8,7 @@ class UserInterface:
 			"move": self.move,
 			"observe": self.observe,
 			"exit": self.exit,
+			"note": self.note,
 		}
 
 		self.querying = False
@@ -77,3 +78,12 @@ class UserInterface:
 
 		self.querying = False
 		return "Exiting!"
+
+
+	def note(self, args):
+		if len(args) <= 0:
+			return "Wrong number of arguments"
+
+		msg = " ".join(args)
+		self.rover.drop_note(msg)
+		return "Note added"
