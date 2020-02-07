@@ -24,28 +24,11 @@ class Terrain:
 		obj.terrain = self
 
 
-	def move_object(self, obj, direction):
-		direction = direction.lower()
-		if direction in ["n"]:
-			self.get_square(obj.x, obj.y).remove(obj)
-			self.add_object(obj, obj.x, obj.y-1)
-
-		elif direction in ["e"]:
-			self.get_square(obj.x, obj.y).remove(obj)
-			self.add_object(obj, obj.x+1, obj.y)
-
-		elif direction in ["s"]:
-			self.get_square(obj.x, obj.y).remove(obj)
-			self.add_object(obj, obj.x, obj.y+1)
-
-		elif direction in ["w"]:
-			self.get_square(obj.x, obj.y).remove(obj)
-			self.add_object(obj, obj.x-1, obj.y)
-
-		else:
-			# TODO: raise exception
-			print("Error in move direction")
-			return
+	def remove_object(self, obj):
+		self.get_square(obj.x, obj.y).remove(obj)
+		obj.x = None
+		obj.y = None
+		obj.terrain = None
 
 
 	def display(self):

@@ -1,24 +1,13 @@
 
 from terrain import Terrain
 from rover import Rover
+from user_interface import UserInterface
 
 terrain = Terrain(5, 5)
-rover = Rover()
 
-terrain.add_object(rover, 3, 3)
-
+start_x, start_y = 3, 3
+rover = Rover(terrain, start_x, start_y)
 terrain.display()
-while True:
-	inp = input("> ")
 
-	if inp is "":
-		pass
-
-	elif inp in ["o", "observe"]:
-		terrain.display()
-
-	elif inp in ["exit", "quit"]:
-		break
-
-	else:
-		rover.move(inp)
+user_interface = UserInterface(rover)
+user_interface.query_loop()
