@@ -24,6 +24,9 @@ class Client:
 
 		while True:
 			action = input("> ")
+			if action is "":
+				continue
+
 			self.server.send(action.encode())
 			response = self.server.recv(1024)
 			print(response.decode())
