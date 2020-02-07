@@ -10,6 +10,10 @@ class Rover(MovableObject):
 		self.view_range = 2
 
 
+	def describe(self):
+		return "A rover."
+
+
 	def observe(self):
 
 		# +1 for range because range works like [start, end)
@@ -41,3 +45,12 @@ class Rover(MovableObject):
 	def drop_note(self, msg):
 		note = Note(msg)
 		self.terrain.add_object(note, self.x, self.y)
+
+
+	def inspect_rel(self, rel_x, rel_y):
+		objs = self.terrain.get_square(self.x+rel_x, self.y+rel_y)
+		if not objs:
+			return "Nothing to inspect."
+
+		result = "\n".join([obj.describe() for obj in objs])
+		return result

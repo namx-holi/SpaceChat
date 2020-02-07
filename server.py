@@ -55,6 +55,9 @@ class ChatServer:
 		while True:
 			user_input = conn.recv(1024)
 			result = user_interface.parse_action(user_input.decode())
+
+			# TODO: Handle when result is None
+
 			conn.send(result.encode())
 
 

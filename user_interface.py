@@ -7,8 +7,11 @@ class UserInterface:
 		self.commands = {
 			"move": self.move,
 			"observe": self.observe,
-			"exit": self.exit,
+
 			"note": self.note,
+			"inspect": self.inspect,
+
+			"exit": self.exit,
 		}
 
 		self.querying = False
@@ -26,6 +29,7 @@ class UserInterface:
 		if action is "":
 			return
 
+		action = action.strip()
 		command, _, args = action.partition(" ")
 		if command not in self.commands:
 			# TODO: Error
@@ -43,6 +47,7 @@ class UserInterface:
 		if len(args) != 1:
 			return "Wrong number of arguments"
 
+		# TODO: Make function to parse direction easily
 		direction = args[0].lower()
 		if direction in ["n", "north"]:
 			self.rover.move_rel(0, -1)
@@ -87,3 +92,25 @@ class UserInterface:
 		msg = " ".join(args)
 		self.rover.drop_note(msg)
 		return "Note added"
+
+
+	def inspect(self, args):
+		if len(args) != 1:
+			return "Wrong number of arguments"
+
+		# TODO: Make function to parse direction easily
+		direction = args[0].lower()
+		if direction in ["n", "north"]:
+			return self.rover.inspect_rel(0, -1)
+
+		elif direction in ["e", "east"]:
+			return self.rover.inspect_rel(+1, 0)
+
+		elif direction in ["s", "south"]:
+			return self.rover.inspect_rel(0, +1)
+
+		elif direction in ["w", "west"]:
+			return self.rover.inspect_rel(-1, 0)
+
+		else:
+			return "Invalid direction"
