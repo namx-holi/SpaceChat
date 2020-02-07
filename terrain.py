@@ -32,10 +32,7 @@ class Terrain:
 
 
 	def display(self):
-
-		# TODO: Class for user interface. Can move imports to the
-		# interface then
-
+		# Displays whole map
 		for row in range(self.height):
 			for col in range(self.width):
 
@@ -47,4 +44,3 @@ class Terrain:
 					print("- ", end="")
 
 			print("")
-

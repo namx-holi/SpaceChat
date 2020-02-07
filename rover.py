@@ -6,3 +6,29 @@ class Rover(MovableObject):
 
 	def __init__(self, terrain, x, y):
 		super().__init__(terrain, x, y)
+		self.view_range = 2
+
+
+	def observe(self):
+
+		# +1 for range because range works like [start, end)
+		x_min = self.x - self.view_range
+		x_max = self.x + self.view_range + 1
+		y_min = self.y - self.view_range
+		y_max = self.y + self.view_range + 1
+
+		s = ""
+
+		for y in range(y_min, y_max):
+			for x in range(x_min, x_max):
+				objs = self.terrain.get_square(x, y)
+
+				if any([isinstance(obj, Rover) for obj in objs]):
+					s += "X "
+
+				else:
+					s += "- "
+
+			s += "\n"
+
+		return s.rstrip()
