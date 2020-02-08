@@ -28,6 +28,9 @@ class Client:
 				continue
 
 			self.server.send(action.encode())
+			if action == "exit":
+				break
+
 			response = self.server.recv(1024)
 			print(response.decode())
 

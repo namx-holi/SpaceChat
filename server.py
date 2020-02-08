@@ -56,9 +56,16 @@ class ChatServer:
 			user_input = conn.recv(1024)
 			result = user_interface.parse_action(user_input.decode())
 
+			if result is None:
+				break
+
 			# TODO: Handle when result is None
 
 			conn.send(result.encode())
+
+		print(f" [*] Ending client connection from {addr[0]}:{addr[1]}")
+		self.terrain.remove_object(rover)
+
 
 
 if __name__ == "__main__":
