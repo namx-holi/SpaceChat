@@ -11,10 +11,16 @@ class Rover(MovableObject):
 
 
 	def describe(self):
+		"""Describes the object when inspected.
+		"""
 		return "A rover."
 
 
 	def observe(self):
+		"""
+		Looks around the rover with it's view range and returns the
+		terrain displayed as a grid.
+		"""
 
 		# +1 for range because range works like [start, end)
 		x_min = self.x - self.view_range
@@ -43,11 +49,17 @@ class Rover(MovableObject):
 
 
 	def drop_note(self, msg):
+		"""Leaves a note on the terrain.
+		"""
+
 		note = Note(msg)
 		self.terrain.add_object(note, self.x, self.y)
 
 
 	def inspect_rel(self, rel_x, rel_y):
+		"""Inspects all objects in a square from the rover.
+		"""
+
 		objs = self.terrain.get_square(self.x+rel_x, self.y+rel_y)
 		if not objs:
 			return "Nothing to inspect."

@@ -13,6 +13,9 @@ class ChatServer:
 
 
 	def run(self, **kwargs):
+		"""Starts the server.
+		"""
+
 		host = kwargs.get("host", "0.0.0.0")
 		port = kwargs.get("port", 7777)
 
@@ -32,6 +35,11 @@ class ChatServer:
 
 
 	def handle_client_connections(self, server):
+		"""
+		Method to accept connections and pass them on to their
+		client handling threads.
+		"""
+
 		while True:
 			try:
 				conn, addr = server.accept()
@@ -47,6 +55,11 @@ class ChatServer:
 
 
 	def client_handler(self, conn, addr):
+		"""
+		Client handling thread. Performs all interaction with the
+		clients.
+		"""
+	
 		# TODO: Have a way to end these on server shutdown
 		rover = Rover(self.terrain, 0, 0)
 		user_interface = UserInterface(rover)

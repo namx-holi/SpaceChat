@@ -8,6 +8,9 @@ class MovableObject:
 
 
 	def move(self, x, y):
+		"""Moves the object to position (x,y) on it's terrain
+		"""
+
 		# Save terrain so we can still reference it
 		terr = self.terrain
 
@@ -16,6 +19,9 @@ class MovableObject:
 
 
 	def move_rel(self, delta_x, delta_y):
+		"""Moves the object a number of spaces from its current position
+		"""
+
 		new_x = self.x + delta_x
 		new_y = self.y + delta_y
 		terr = self.terrain

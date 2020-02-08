@@ -25,6 +25,9 @@ class UserInterface:
 
 
 	def parse_action(self, action):
+		"""Parses a user entered string into a command and runs it.
+		"""
+
 		# Ignore empty imput
 		if action is "":
 			return
@@ -44,6 +47,13 @@ class UserInterface:
 
 
 	def move(self, args):
+		"""
+		Moves the user in a direction.
+
+		Requires arg:
+			direction
+		"""
+
 		if len(args) != 1:
 			return "Wrong number of arguments"
 
@@ -70,6 +80,12 @@ class UserInterface:
 
 
 	def observe(self, args):
+		"""
+		Observes the tiles around the user.
+
+		Requires no args.
+		"""
+
 		if len(args) != 0:
 			return "Wrong number of arguments"
 
@@ -78,6 +94,12 @@ class UserInterface:
 
 
 	def exit(self, args):
+		"""
+		Exits the server.
+
+		Requires no args.
+		"""
+
 		if len(args) != 0:
 			return "Wrong number of arguments"
 
@@ -86,6 +108,13 @@ class UserInterface:
 
 
 	def note(self, args):
+		"""
+		Leaves a note on the current tile.
+
+		Requires arg:
+			msg
+		"""
+
 		if len(args) <= 0:
 			return "Wrong number of arguments"
 
@@ -95,6 +124,13 @@ class UserInterface:
 
 
 	def inspect(self, args):
+		"""
+		Inspects the tile in a direction from the rover.
+
+		Requires arg:
+			direction
+		"""
+
 		if len(args) != 1:
 			return "Wrong number of arguments"
 

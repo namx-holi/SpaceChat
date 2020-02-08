@@ -12,6 +12,9 @@ class Client:
 
 
 	def connect(self):
+		"""Connects to the chat server
+		"""
+
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		# TODO: Set a timeout
 
@@ -20,6 +23,9 @@ class Client:
 
 
 	def input_loop(self):
+		"""Connects to the server and constantly sends user input
+		"""
+
 		self.connect()
 
 		while True:

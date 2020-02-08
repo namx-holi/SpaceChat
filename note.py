@@ -6,4 +6,6 @@ class Note:
 
 
 	def describe(self):
+		"""Describes the object when inspected
+		"""
 		return f"A note. It says `{self.msg}`"

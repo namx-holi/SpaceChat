@@ -14,10 +14,16 @@ class Terrain:
 
 
 	def get_square(self, x, y):
+		"""Returns the list of objects at point (x,y).
+		"""
+
 		return self.map[y % self.height][x % self.width]
 
 
 	def add_object(self, obj, x, y):
+		"""Adds an object to the square at (x,y).
+		"""
+
 		self.get_square(x,y).append(obj)
 		obj.x = x % self.width
 		obj.y = y % self.height
@@ -25,6 +31,9 @@ class Terrain:
 
 
 	def remove_object(self, obj):
+		"""Removes the given object from the terrain.
+		"""
+
 		self.get_square(obj.x, obj.y).remove(obj)
 		obj.x = None
 		obj.y = None
