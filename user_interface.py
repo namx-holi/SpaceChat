@@ -17,13 +17,6 @@ class UserInterface:
 		self.querying = False
 
 
-	def query_loop(self):
-		self.querying = True
-		while self.querying:
-			action = input("> ")
-			self.parse_action(action)
-
-
 	def parse_action(self, action):
 		"""Parses a user entered string into a command and runs it.
 		"""

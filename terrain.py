@@ -34,7 +34,11 @@ class Terrain:
 		"""Removes the given object from the terrain.
 		"""
 
+		# TODO: Check if the object is even on the terrain first
+
 		self.get_square(obj.x, obj.y).remove(obj)
 		obj.x = None
 		obj.y = None
 		obj.terrain = None
+
+		# TODO: Return a value to indicate it failed or succeeded

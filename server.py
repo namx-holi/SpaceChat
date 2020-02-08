@@ -30,6 +30,7 @@ class ChatServer:
 		self.handle_client_connections(server)
 
 		# Once done, close socket
+		print(f" [*] Server shutting down")
 		server.shutdown(socket.SHUT_RDWR)
 		server.close()
 
