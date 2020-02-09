@@ -2,9 +2,10 @@
 
 class MovableObject:
 
-	def __init__(self, terrain, x, y):
-		self.terrain = terrain
-		self.terrain.add_object(self, x, y)
+	def __init__(self):
+		self.x = None
+		self.y = None
+		self.terrain = None
 
 
 	def move(self, x, y):

@@ -3,6 +3,7 @@ import threading
 
 from rover import Rover
 from terrain import Terrain
+from user import User
 from user_interface import UserInterface
 
 
@@ -10,6 +11,7 @@ class ChatServer:
 
 	def __init__(self):
 		self.terrain = Terrain(20, 20)
+		self.users = {}
 
 
 	def run(self, **kwargs):
@@ -60,10 +62,20 @@ class ChatServer:
 		Client handling thread. Performs all interaction with the
 		clients.
 		"""
-	
+
+		user = self.login_user(conn)
+		print(user)
+		if not user:
+			conn.send(b"Failed login.")
+			print(f" [*] Client from {addr[0]}:{addr[1]} failed to log in.")
+			conn.close()
+			return
+		else:
+			conn.send(b"Logged in!.")
+
 		# TODO: Have a way to end these on server shutdown
-		rover = Rover(self.terrain, 0, 0)
-		user_interface = UserInterface(rover)
+		self.terrain.add_object(user.rover, 0, 0)
+		user_interface = UserInterface(user.rover)
 
 		# TODO: Dynamically read bytes
 		while True:
@@ -78,7 +90,46 @@ class ChatServer:
 			conn.send(result.encode())
 
 		print(f" [*] Ending client connection from {addr[0]}:{addr[1]}")
-		self.terrain.remove_object(rover)
+		self.terrain.remove_object(user.rover)
+		conn.close()
+
+
+	def login_user(self, conn):
+		# Read login string?
+		user_input = ""
+
+		while True:
+			user_input = conn.recv(1024).decode()
+
+			if user_input == "exit":
+				return
+
+			if (
+				user_input.startswith("login")
+				or user_input.startswith("register")
+			):
+				break
+
+			
+			conn.send(b"Please log in with `login <user> <pword>`,"+
+				b"or register with `register <user> <pword>`.")
+
+		action, _, args = user_input.partition(" ")
+		username, _, pword = args.partition(" ")
+		# TODO: Handle password
+
+		print(action)
+		print(username)
+		print(pword)
+
+		if action == "register":
+			user = User(username)
+			self.users[username] = user
+			return user
+
+		return self.users.get(username, None)
+
+
 
 
 

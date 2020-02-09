@@ -5,15 +5,18 @@ from note import Note
 
 class Rover(MovableObject):
 
-	def __init__(self, terrain, x, y):
-		super().__init__(terrain, x, y)
+	def __init__(self, user):
+		super().__init__()
+		self.user = user
+
 		self.view_range = 2
 
 
 	def describe(self):
 		"""Describes the object when inspected.
 		"""
-		return "A rover."
+
+		return f"{self.user.name}'s rover."
 
 
 	def observe(self):
