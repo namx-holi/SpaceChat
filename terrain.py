@@ -1,6 +1,4 @@
 
-from rover import Rover
-
 
 class Terrain:
 
@@ -14,31 +12,27 @@ class Terrain:
 
 
 	def get_square(self, x, y):
-		"""Returns the list of objects at point (x,y).
-		"""
-
 		return self.map[y % self.height][x % self.width]
 
 
-	def add_object(self, obj, x, y):
-		"""Adds an object to the square at (x,y).
-		"""
+	def register_object(self, obj):
+		obj.terrain = self
+		obj.x = 0
+		obj.y = 0
 
+
+	def unregister_object(self, obj):
+		obj.terrain = None
+		obj.x = None
+		obj.y = None
+
+
+	def add_object(self, obj, x, y):
 		self.get_square(x,y).append(obj)
 		obj.x = x % self.width
 		obj.y = y % self.height
-		obj.terrain = self
 
 
 	def remove_object(self, obj):
-		"""Removes the given object from the terrain.
-		"""
-
-		# TODO: Check if the object is even on the terrain first
-
+		# TODO: Check if the object is even on the terrain
 		self.get_square(obj.x, obj.y).remove(obj)
-		obj.x = None
-		obj.y = None
-		obj.terrain = None
-
-		# TODO: Return a value to indicate it failed or succeeded

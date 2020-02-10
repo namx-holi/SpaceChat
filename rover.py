@@ -8,22 +8,14 @@ class Rover(MovableObject):
 	def __init__(self, user):
 		super().__init__()
 		self.user = user
-
 		self.view_range = 2
 
 
 	def describe(self):
-		"""Describes the object when inspected.
-		"""
-
 		return f"{self.user.name}'s rover."
 
 
 	def observe(self):
-		"""
-		Looks around the rover with it's view range and returns the
-		terrain displayed as a grid.
-		"""
 
 		# +1 for range because range works like [start, end)
 		x_min = self.x - self.view_range
@@ -31,41 +23,32 @@ class Rover(MovableObject):
 		y_min = self.y - self.view_range
 		y_max = self.y + self.view_range + 1
 
-		s = ""
-
+		tiles = []
 		for y in range(y_min, y_max):
+			row = []
 			for x in range(x_min, x_max):
-				objs = self.terrain.get_square(x, y)
+				objs = self.terrain.get_square(x,y)
 
 				if any([isinstance(obj, Rover) for obj in objs]):
-					s += "X "
-
+					row.append("X")
 				elif any([isinstance(obj, Note) for obj in objs]):
-					s += "M "
-
+					row.append("M")
 				else:
-					s += "- "
+					row.append("-")
 
-			s += "\n"
+			tiles.append(row)
 
-		return s.rstrip()
+		return tiles
 
 
-	def drop_note(self, msg):
-		"""Leaves a note on the terrain.
-		"""
-
-		note = Note(msg)
+	def leave_note(self, msg):
+		note = Note(self.user, msg)
+		self.terrain.register_object(note)
 		self.terrain.add_object(note, self.x, self.y)
 
 
-	def inspect_rel(self, rel_x, rel_y):
-		"""Inspects all objects in a square from the rover.
-		"""
-
-		objs = self.terrain.get_square(self.x+rel_x, self.y+rel_y)
-		if not objs:
-			return "Nothing to inspect."
-
-		result = "\n".join([obj.describe() for obj in objs])
-		return result
+	def inspect(self, rel_x, rel_y):
+		x = self.x + rel_x
+		y = self.y + rel_y
+		objs = self.terrain.get_square(x,y)
+		return [obj.describe() for obj in objs]

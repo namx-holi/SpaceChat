@@ -8,15 +8,19 @@ class MovableObject:
 		self.terrain = None
 
 
+	def add_to_terrain(self):
+		self.terrain.add_object(self, self.x, self.y)
+	def remove_from_terrain(self):
+		self.terrain.remove_object(self)
+
+
 	def move(self, x, y):
 		"""Moves the object to position (x,y) on it's terrain
 		"""
 
 		# Save terrain so we can still reference it
-		terr = self.terrain
-
 		self.terrain.remove_object(self)
-		terr.add_object(self, x, y)
+		self.terrain.add_object(self, x, y)
 
 
 	def move_rel(self, delta_x, delta_y):
@@ -25,5 +29,4 @@ class MovableObject:
 
 		new_x = self.x + delta_x
 		new_y = self.y + delta_y
-		terr = self.terrain
 		self.move(new_x, new_y)

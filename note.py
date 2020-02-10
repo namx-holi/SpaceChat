@@ -1,11 +1,9 @@
 
 class Note:
 
-	def __init__(self, msg):
+	def __init__(self, user, msg):
+		self.user = user
 		self.msg = msg
 
-
 	def describe(self):
-		"""Describes the object when inspected
-		"""
-		return f"A note. It says `{self.msg}`"
+		return f"{self.user.name}'s note. It says `{self.msg}`"
