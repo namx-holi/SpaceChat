@@ -80,6 +80,54 @@ def requires_fields(*fields):
 
 
 
+# Help endpoint
+# Returns a list of commands that are able to be used,
+# along with the required arguments and a description.
+@app.route("/api/help", methods=["POST"])
+def command_help():
+	command_help = dict(
+		help=dict(
+			desc="Displays this message.",
+			args=[],
+			requires_token=False),
+		register=dict(
+			desc="Register a new account.",
+			args=["username", "password"],
+			requires_token=False),
+		login=dict(
+			desc="Logs in a user. Returns a token to use.",
+			args=["username", "password"],
+			requires_token=False),
+		move=dict(
+			desc="Moves your rover in a compass direction.",
+			args=["direction"],
+			requires_token=True),
+		observe=dict(
+			desc="Observes what is around your rover.",
+			args=[],
+			requires_token=True),
+		note=dict(
+			desc="Leaves a note with a message at your location.",
+			args=["msg"],
+			requires_token=True),
+		inspect=dict(
+			desc="Inspects a tile in a compass direction of your rover.",
+			args=["direction"],
+			requires_token=True),
+		message=dict(
+			desc="Sends a message to the whole planet.",
+			args=["msg"],
+			requires_token=True),
+		logout=dict(
+			desc="Logs out.",
+			args=[],
+			requires_token=True),
+	)
+
+	return jsonify(command_help), 200
+
+
+
 # Register endpoint
 # Should allow users to post their desired username and password hash.
 # These should be stored into a db.
