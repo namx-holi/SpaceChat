@@ -5,6 +5,7 @@ import select
 import socket
 import struct
 import threading
+import traceback
 
 
 BASE_API_URL = "http://localhost:7777/api"
@@ -56,8 +57,8 @@ class Client:
 
 			try:
 				self.handle(user_input)
-			except:
-				pass
+			except Exception as e:
+				traceback.print_exc()
 
 
 	def handle(self, user_input):
