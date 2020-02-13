@@ -8,6 +8,9 @@ from session import Session
 from terrain import Terrain
 from user import User
 
+from message_manager import MessageManager
+from message_manager import Message, ServerMessage
+
 
 app = Flask(__name__)
 
@@ -15,6 +18,12 @@ app = Flask(__name__)
 users = {}
 sessions = {}
 terrain = Terrain(20, 20)
+
+
+# For broadcasts
+msg_manager = MessageManager(sessions)
+msg_manager.start(7778)
+
 
 
 @app.route("/")
@@ -241,6 +250,35 @@ def inspect():
 
 
 
+# Message endpoint
+# Allows users to send a message to the whole world!
+@app.route("/api/message", methods=["POST"])
+@requires_token
+def message():
+	if "msg" not in request.json:
+		return jsonify(dict(
+			error="Missing msg field"
+		)), 400
+	msg = request.json["msg"]
+	if len(msg) > 200:
+		return jsonify(dict(
+			error="msg must be under 200 characters"
+		)), 400
+
+	token = request.json["token"]
+	session = sessions[token]
+	username = session.user.name
+
+	msg = Message(username, msg)
+	print("Sending", msg)
+	msg_manager.send_to_all(msg)
+
+	return jsonify(dict(
+		msg="Message sent!",
+	)), 200
+
+
+
 # # Broadcast endpoint
 # # Constantly downloads broadcasts!
 # @app.route("/api/broadcast", methods=["GET"])
@@ -286,29 +324,26 @@ def logout_user():
 
 
 
-# # Test method
-# def broadcast_loop():
-# 	import time
+# Test method
+def broadcast_loop():
+	import time
 	
-# 	ticks = 0
-# 	while True:
-# 		print("Adding message to backlocks")
-# 		for session_token in sessions:
-# 			session = sessions[session_token]
+	ticks = 0
+	while True:
+		msg = ServerMessage(f"Time: {ticks}")
+		print("Broadcasting message", msg)
+		msg_manager.send_to_all(msg)
 
-# 			if session.broadcasting:
-# 				session.broadcast_backlog.append(f"Time: {ticks}")
-
-# 		ticks += 1
-# 		time.sleep(5)
+		ticks += 1
+		time.sleep(5)
 
 
 if __name__ == "__main__":
 	import threading
 
-	# # Start a broadcast loop thread
-	# broadcast_loop_thread = threading.Thread(
-	# 	target=broadcast_loop)
-	# broadcast_loop_thread.start()
+	# Start a broadcast loop thread
+	broadcast_loop_thread = threading.Thread(
+		target=broadcast_loop)
+	broadcast_loop_thread.start()
 
-	app.run(debug=False)
+	app.run(port=7777, debug=False)

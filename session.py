@@ -18,10 +18,6 @@ class Session:
 		# Add their rover back to last location
 		self.rover.add_to_terrain()
 
-		# Backlog of broadcasts received
-		self.broadcasting = False
-		self.broadcast_backlog = []
-
 
 	def close(self):
 		self.token = None
@@ -29,10 +25,3 @@ class Session:
 
 		# Remove their rover from terrain
 		self.rover.remove_from_terrain()
-
-
-	def broadcast_generator(self):
-		if self.broadcast_backlog:
-			yield None
-		msg = self.broadcast_backlog.pop(0)
-		yield msg

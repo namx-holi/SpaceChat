@@ -1,7 +1,7 @@
 
 import requests
 
-BASE_URL = "http://localhost:5000/api"
+BASE_URL = "http://localhost:7777/api"
 
 
 def make_request(endpoint, json):
