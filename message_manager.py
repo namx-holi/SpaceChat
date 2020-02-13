@@ -108,7 +108,7 @@ class MessageManager:
 		# Check given token
 		success, msg = self.auth_conn(conn)
 		if not success:
-			print("{}:{} Failed authentication".format(*addr))
+			print("{}:{} failed authentication on broadcast server".format(*addr))
 			conn.send(to_packet(json.dumps(msg)))
 			conn.close()
 			return
@@ -159,9 +159,9 @@ class MessageManager:
 		token = token_raw.decode()
 
 		if token not in self.sessions:
-			return False, dict(error="Invalid token")
+			return False, dict(error="invalid token")
 
-		return True, dict(msg="Logged in")
+		return True, dict(msg="logged in to broadcast server")
 
 
 	def register_conn(self, conn):

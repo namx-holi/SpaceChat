@@ -362,6 +362,7 @@ if __name__ == "__main__":
 	# Start a broadcast loop thread
 	broadcast_loop_thread = threading.Thread(
 		target=broadcast_loop)
+	broadcast_loop_thread.daemon = True
 	broadcast_loop_thread.start()
 
 	app.run(port=7777, debug=False)
