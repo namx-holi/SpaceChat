@@ -8,8 +8,9 @@ import threading
 import traceback
 
 
-BASE_API_URL = "http://localhost:7777/api"
-BROADCAST_HOST = "0.0.0.0"
+HOST = "0.0.0.0"
+BASE_API_URL = f"http://{HOST}:7777/api"
+BROADCAST_HOST = f"{HOST}"
 BROADCAST_PORT = 7778
 
 

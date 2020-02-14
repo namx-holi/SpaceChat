@@ -365,4 +365,4 @@ if __name__ == "__main__":
 	broadcast_loop_thread.daemon = True
 	broadcast_loop_thread.start()
 
-	app.run(port=7777, debug=False)
+	app.run(host="0.0.0.0", port=7777, debug=False)
