@@ -5,10 +5,12 @@ import select
 import socket
 import struct
 import threading
+import traceback
 
 
-BASE_API_URL = "http://localhost:7777/api"
-BROADCAST_HOST = "0.0.0.0"
+HOST = "0.0.0.0"
+BASE_API_URL = f"http://{HOST}:7777/api"
+BROADCAST_HOST = f"{HOST}"
 BROADCAST_PORT = 7778
 
 
@@ -56,14 +58,17 @@ class Client:
 
 			try:
 				self.handle(user_input)
-			except:
-				pass
+			except Exception as e:
+				traceback.print_exc()
 
 
 	def handle(self, user_input):
 		action, _, args = user_input.partition(" ")
 		args = args.strip().split(" ")
-		if action == "register":
+		if action == "help":
+			self.help()
+
+		elif action == "register":
 			username = args[0]
 			password = " ".join(args[1:])
 			self.register(username, password)
@@ -135,6 +140,29 @@ class Client:
 		self.broadcast_conn = None
 
 
+	def help(self):
+		data = dict()
+		resp = make_request("help", data)
+
+		print("Keys:", resp.keys())
+		print("Sorted keys:", sorted(resp.keys()))
+
+		for command in sorted(resp.keys()):
+			desc = resp[command]["desc"]
+			args = resp[command]["args"]
+			requires_token = resp[command]["requires_token"]
+
+			print("{}{}{}".format(
+				command,
+				"" if not args else " " + " ".join(args),
+				"" if not requires_token else " (requires token)"
+			))
+			print(f"  - {desc}")
+
+
+		# TODO: Display help in a nice way.
+
+
 	def register(self, username, password):
 		data = dict(username=username, password=password)
 		resp = make_request("register", data)
@@ -182,7 +210,7 @@ class Client:
 		self.logged_in = False
 
 
-
+print("Type 'exit' to exit the client.")
 client = Client()
 client.run()
 print("Exited!")

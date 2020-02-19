@@ -1,4 +1,7 @@
 __pycache__
 *.sublime*
 venv
+
+# Folders used to store old code while refactoring
 old
+pre_bp
