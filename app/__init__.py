@@ -1,6 +1,7 @@
 from flask import Flask
 # from config import Config
 
+from managers.message_manager import MessageManager
 from managers.session_manager import SessionManager
 from managers.terrain_manager import TerrainManager
 from managers.user_manager import UserManager
@@ -10,6 +11,8 @@ from managers.user_manager import UserManager
 session_manager = SessionManager()
 terrain_manager = TerrainManager()
 user_manager = UserManager()
+
+message_manager = MessageManager(session_manager)
 
 
 # def create_app(config=Config):

@@ -5,6 +5,8 @@ from app.game import bp
 from app.helpers import requires_token, uses_fields
 from app.helpers import direction_to_delta
 
+from app import message_manager
+
 
 @bp.route("/api/move", methods=["POST"])
 @requires_token
@@ -92,15 +94,18 @@ def inspect(session, direction):
 @bp.route("/api/message", methods=["POST"])
 @requires_token
 @uses_fields("msg")
-def broadcast_message(session, msg):
-	...
-	# Check if msg length is under 200 characters
-	# TODO
+def send_message(session, msg):
 
-	# Add message to message handler for terrain
-	# TODO
+	# Check if msg length is under 200 characters
+	if len(msg) > 200:
+		return jsonify(dict(
+			error="msg must be under 200 characters"
+		)), 400
+
+	# Add message to message manager
+	message_manager.send_message(session.user, msg)
 
 	# Return success
-	# TODO
-
-	return "NOT IMPLEMENTED"
+	return jsonify(dict(
+		msg="message sent"
+	)), 200
