@@ -182,6 +182,9 @@ class Client:
 
 
 	def login(self, username, password):
+		if self.logged_in:
+			self.logout()
+
 		data = dict(username=username, password=password)
 		resp = make_request("login", data)
 		self.token = resp.get("token", None)

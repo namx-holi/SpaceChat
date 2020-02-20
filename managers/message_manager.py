@@ -84,8 +84,9 @@ class MessageManager:
 		self.session_manager = session_manager
 		self.conn_limit = kwargs.get("conn_limit", 20)
 
-		self.conn_message_queues = set()
-		self.conn_to_queue_map = dict()
+		# Used to look up the connection from a session
+		self.session_to_queue_map = dict()
+		self.client_queues = set()
 
 		running_thread = threading.Thread(
 			target=self.run)
@@ -128,7 +129,7 @@ class MessageManager:
 		print("{}:{} authenticated!".format(*addr))
 
 		# Register this connection with manager.
-		q = self.register_conn(conn)
+		q = self.register_client(session)
 
 		# Turn off blocking so we can read with timeout
 		conn.setblocking(0)
@@ -147,12 +148,18 @@ class MessageManager:
 			ready = select.select([conn], [], [], MSG_CHECK_TIMEOUT)
 			if ready[0]:
 				raw = conn.recv(1024)
+
+				# If we were sent nothing but the socket was ready,
+				# the client disconnected.
+				if not raw:
+					break
+
 				data = raw.decode().strip()
 				if data.upper() == "EXIT":
 					# If exit, stop this!
 					break
 
-		self.unregister_conn(conn)
+		self.unregister_client(session)
 		conn.close()
 		print("Connection to {}:{} closed.".format(*addr))
 
@@ -187,27 +194,32 @@ class MessageManager:
 		return session
 
 
-	def register_conn(self, conn):
+	def register_client(self, session):
 		q = queue.Queue()
-		self.conn_message_queues.add(q)
-		self.conn_to_queue_map[conn] = q
+
+		# Check if there is an old session.
+		if session in self.session_to_queue_map:
+			self.unregister_client(session)
+
+		self.session_to_queue_map[session] = q
+		self.client_queues.add(q)
 		return q
 
 
-	def unregister_conn(self, conn):
-		q = self.conn_to_queue_map[conn]
+	def unregister_client(self, session):
+		q = self.session_to_queue_map[session]
 		q.queue.clear() # Not necessary
-		self.conn_message_queues.remove(q)
-		del self.conn_to_queue_map[conn]
+		self.client_queues.remove(q)
+		del self.session_to_queue_map[session]
 
 
 	def send_message(self, user, msg):
 		msg = UserMessage(user, msg)
-		for q in self.conn_message_queues:
+		for q in self.client_queues:
 			q.put(msg)
 
 
 	def send_server_message(self, msg):
 		msg = ServerMessage(msg)
-		for q in self.conn_message_queues:
+		for q in self.client_queues:
 			q.put(msg)
