@@ -182,7 +182,7 @@ class MessageManager:
 			conn.send(to_packet(json.dumps(msg)))
 			return
 
-		msg = dict(msg="logged ino to broadcast server")
+		msg = dict(msg="logged into to broadcast server")
 		conn.send(to_packet(json.dumps(msg)))
 		return session
 

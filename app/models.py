@@ -10,6 +10,7 @@ class User:
 		self.password_hash = None
 		self.rover = None
 		self.notes = set()
+		self.smails = []
 
 
 	def set_password(self, password):
@@ -19,6 +20,19 @@ class User:
 
 	def check_password(self, password):
 		return bcrypt.checkpw(password.encode(), self.password_hash)
+
+
+
+class SMail:
+	def __init__(self, sender, recipient, subject, msg):
+		self.sender = sender
+		self.recipient = recipient
+
+		# TODO: Add ref in recipient to this
+		# self.recipient.smails.append(self)
+
+		self.subject = subject
+		self.msg = msg
 
 
 

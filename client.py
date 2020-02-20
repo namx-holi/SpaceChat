@@ -97,6 +97,19 @@ class Client:
 			msg = " ".join(args)
 			self.message(msg)
 
+		elif action == "send-smail":
+			recipient = args[0]
+			subject_and_content = " ".join(args[1:])
+			subject, _, msg = subject_and_content.partition("|")
+			self.send_smail(recipient, subject, msg)
+
+		elif action == "check-smail":
+			self.check_smail()
+
+		elif action == "read-smail":
+			smail_id = args[0]
+			self.read_smail(smail_id)
+
 		elif action == "logout":
 			self.logout()
 
@@ -202,6 +215,22 @@ class Client:
 	def message(self, msg):
 		data = dict(token=self.token, msg=msg)
 		resp = make_request("message", data)
+
+
+	def send_smail(self, recipient, subject, msg):
+		data = dict(token=self.token,
+			recipient=recipient, subject=subject, msg=msg)
+		resp = make_request("send-smail", data)
+
+
+	def check_smail(self):
+		data = dict(token=self.token)
+		resp = make_request("check-smail", data)
+
+
+	def read_smail(self, smail_id):
+		data = dict(token=self.token, smail_id=smail_id)
+		resp = make_request("read-smail", data)
 
 
 	def logout(self):
