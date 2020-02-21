@@ -44,6 +44,22 @@ class UserMessage(Message):
 		return f"<UserMessage '{self.user.name}: {self.msg}'>"
 
 
+class WhisperMessage(Message):
+	@property
+	def content(self):
+		return dict(
+			username=self.user.username,
+			recipient=self.recipient.username,
+			msg=self.msg)
+	def __init__(self, user, recipient, msg):
+		super().__init__(msg)
+		self.user = user
+		self.recipient = recipient
+	def __repr__(self):
+		return "<WhisperMessage to {}: '{}: {}'>".format(
+			self.recipient.name, self.user.name, self.msg)
+
+
 class ServerMessage(Message):
 	def __init__(self, msg):
 		super().__init__(msg)
@@ -84,8 +100,8 @@ class MessageManager:
 		self.session_manager = session_manager
 		self.conn_limit = kwargs.get("conn_limit", 20)
 
-		# Used to look up the connection from a session
-		self.session_to_queue_map = dict()
+		# Used to look up the connection from a user
+		self.user_to_queue_map = dict()
 		self.client_queues = set()
 
 		running_thread = threading.Thread(
@@ -129,7 +145,7 @@ class MessageManager:
 		print("{}:{} authenticated!".format(*addr))
 
 		# Register this connection with manager.
-		q = self.register_client(session)
+		q = self.register_client(session.user)
 
 		# Turn off blocking so we can read with timeout
 		conn.setblocking(0)
@@ -142,7 +158,7 @@ class MessageManager:
 				# No message to send to the client!
 				pass
 			else:
-				self._send(conn, session, msg)
+				self._send(conn, session.user, msg)
 
 			# Try receive anything (could be an exit)
 			ready = select.select([conn], [], [], MSG_CHECK_TIMEOUT)
@@ -159,23 +175,30 @@ class MessageManager:
 					# If exit, stop this!
 					break
 
-		self.unregister_client(session)
+		self.unregister_client(session.user)
 		conn.close()
 		print("Connection to {}:{} closed.".format(*addr))
 
 
-	def _send(self, conn, session, msg):
+	def _send(self, conn, user, msg):
 		if isinstance(msg, ServerMessage):
 			# Server messages are broadcasts
 			conn.send(msg.encode())
 
 		elif isinstance(msg, UserMessage):
 			# User messages are for same terrain only
-			if msg.user.rover.terrain == session.user.rover.terrain:
+			if msg.user.rover.terrain == user.rover.terrain:
+				conn.send(msg.encode())
+
+		elif isinstance(msg, WhisperMessage):
+			# Whispers are only for those who sent it
+			# and the person it's directed at
+			if msg.user == user or msg.recipient == user:
 				conn.send(msg.encode())
 
 		else:
 			# Not sure what this is! Send it anyway!
+			print("Unknown message type:", msg)
 			conn.send(msg.encode())
 
 
@@ -194,32 +217,61 @@ class MessageManager:
 		return session
 
 
-	def register_client(self, session):
+	def register_client(self, user):
 		q = queue.Queue()
 
-		# Check if there is an old session.
-		if session in self.session_to_queue_map:
-			self.unregister_client(session)
+		# Check if this user is already registered.
+		if user in self.user_to_queue_map:
+			self.unregister_client(user)
 
-		self.session_to_queue_map[session] = q
+		self.user_to_queue_map[user] = q
 		self.client_queues.add(q)
 		return q
 
 
-	def unregister_client(self, session):
-		q = self.session_to_queue_map[session]
+	def unregister_client(self, user):
+		q = self.user_to_queue_map[user]
 		q.queue.clear() # Not necessary
 		self.client_queues.remove(q)
-		del self.session_to_queue_map[session]
+		del self.user_to_queue_map[user]
 
 
 	def send_message(self, user, msg):
 		msg = UserMessage(user, msg)
+
+		# TODO: Think of getting the terrain of the
+		# user with user.rover.terrain, then adding
+		# only to the queues of users on that
+		# terrain. Would lessen the overhead for
+		# each user session process!
+
 		for q in self.client_queues:
 			q.put(msg)
 
 
+	def send_whisper(self, user, recipient, msg):
+		msg = WhisperMessage(user, recipient, msg)
+
+		# Just put in the user and recipient queues
+		# There is no point wasting processing for
+		# other users sorting the messages.
+		user_q = self.user_to_queue_map.get(user, None)
+		if not user_q:
+			raise Exception(f"user has no queue: {user}")
+		recipient_q = self.user_to_queue_map.get(recipient, None)
+		if not recipient_q:
+			raise Exception(f"recipient has no queue: {recipient}")
+
+		# If for some reason the user chose to send a whisper
+		# to themself, don't double add
+		user_q.put(msg)
+		if user == recipient:
+			return
+		recipient_q.put(msg)
+
+
 	def send_server_message(self, msg):
 		msg = ServerMessage(msg)
+		# Server message is for all users logged in.
 		for q in self.client_queues:
 			q.put(msg)

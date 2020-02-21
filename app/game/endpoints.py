@@ -5,7 +5,7 @@ from app.game import bp
 from app.helpers import requires_token, uses_fields
 from app.helpers import direction_to_delta
 from app.models import SMail
-from app import message_manager, user_manager
+from app import message_manager, session_manager, user_manager
 
 
 @bp.route("/api/move", methods=["POST"])
@@ -108,6 +108,39 @@ def send_message(session, msg):
 	# Return success
 	return jsonify(dict(
 		msg="message sent"
+	)), 200
+
+
+@bp.route("/api/whisper", methods=["POST"])
+@requires_token
+@uses_fields("recipient", "msg")
+def send_whisper(session, recipient, msg):
+
+	# Check if msg length is under 200 characters
+	if len(msg) > 200:
+		return jsonify(dict(
+			error="msg must be under 200 characters"
+		)), 400
+
+	# Check if the recipient exists
+	recipient = user_manager.get_by_name(recipient)
+	if not recipient:
+		return jsonify(dict(
+			error="recipient does not exist"
+		)), 400
+
+	# Check if the recipient is logged in!
+	# They cannot receive the message otherwise
+	if not session_manager.get_by_user(recipient):
+		return jsonify(dict(
+			error="user is unable to receive whisper"
+		)), 400
+
+	message_manager.send_whisper(session.user, recipient, msg)
+
+	# Return success
+	return jsonify(dict(
+		msg="whipser sent"
 	)), 200
 
 

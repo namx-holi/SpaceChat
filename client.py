@@ -17,7 +17,11 @@ BROADCAST_PORT = 7778
 def make_request(endpoint, data):
 	url = f"{BASE_API_URL}/{endpoint}"
 	r = requests.post(url=url, json=data)
-	resp = r.json()
+	try:
+		resp = r.json()
+	except Exception as e:
+		print(r.text)
+		raise e
 	print(resp)
 	print("")
 	return resp
@@ -96,6 +100,11 @@ class Client:
 		elif action == "message":
 			msg = " ".join(args)
 			self.message(msg)
+
+		elif action == "whisper":
+			recipient = args[0]
+			msg = " ".join(args[1:])
+			self.whisper(recipient, msg)
 
 		elif action == "send-smail":
 			recipient = args[0]
@@ -218,6 +227,11 @@ class Client:
 	def message(self, msg):
 		data = dict(token=self.token, msg=msg)
 		resp = make_request("message", data)
+
+
+	def whisper(self, recipient, msg):
+		data = dict(token=self.token, recipient=recipient, msg=msg)
+		resp = make_request("whisper", data)
 
 
 	def send_smail(self, recipient, subject, msg):
