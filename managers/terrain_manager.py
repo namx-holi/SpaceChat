@@ -2,6 +2,9 @@
 
 class TerrainTile:
 
+	# TODO: Keep track of users that are on the terrain
+	# This could be done by registering them?
+
 	def __init__(self, terrain, x, y):
 		self.terrain = terrain
 		self.x = x

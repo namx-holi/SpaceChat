@@ -163,26 +163,12 @@ class Client:
 
 
 	def help(self):
-		data = dict()
-		resp = make_request("help", data)
-
-		print("Keys:", resp.keys())
-		print("Sorted keys:", sorted(resp.keys()))
-
-		for command in sorted(resp.keys()):
-			desc = resp[command]["desc"]
-			args = resp[command]["args"]
-			requires_token = resp[command]["requires_token"]
-
-			print("{}{}{}".format(
-				command,
-				"" if not args else " " + " ".join(args),
-				"" if not requires_token else " (requires token)"
-			))
-			print(f"  - {desc}")
-
-
-		# TODO: Display help in a nice way.
+		# TODO: Write a help message for commands
+		# The reason this will become client-fat is
+		# because the client will eventually pivot to
+		# a UI where only the api requests will be
+		# sent without the need for manual commands
+		print("STUB: Help message. Oops!")
 
 
 	def register(self, username, password):
