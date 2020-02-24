@@ -3,6 +3,9 @@ from flask import request, jsonify
 import functools
 from app import session_manager
 
+# TODO: Move settings to a settings file!
+from managers.session_manager import INACTIVITY_TIMEOUT_TIME
+
 
 def requires_token(func):
 	"""
@@ -30,6 +33,17 @@ def requires_token(func):
 			return jsonify(dict(
 				error="invalid token"
 			)), 400
+
+		# Check if the session has timed out due to inactivity
+		if session.timed_out():
+			session.close()
+			return jsonify(dict(
+				error="session timed out (inactive for {} minutes)".format(
+					INACTIVITY_TIMEOUT_TIME)
+			)), 400
+
+		# Update the last active time
+		session.update_last_active()
 
 		# Call the original func
 		return func(session, *args, **kwargs)
