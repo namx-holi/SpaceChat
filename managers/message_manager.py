@@ -22,8 +22,6 @@ class Message:
 		return to_packet(data)
 	def __repr__(self):
 		return f"<Message '{self.msg}'>"
-
-
 class UserMessage(Message):
 	@property
 	def content(self):
@@ -35,8 +33,6 @@ class UserMessage(Message):
 		self.user = user
 	def __repr__(self):
 		return f"<UserMessage '{self.user.name}: {self.msg}'>"
-
-
 class WhisperMessage(Message):
 	@property
 	def content(self):
@@ -51,8 +47,6 @@ class WhisperMessage(Message):
 	def __repr__(self):
 		return "<WhisperMessage to {}: '{}: {}'>".format(
 			self.recipient.name, self.user.name, self.msg)
-
-
 class ServerMessage(Message):
 	def __init__(self, msg):
 		super().__init__(msg)
@@ -61,10 +55,24 @@ class ServerMessage(Message):
 
 
 
+class SMail:
+	def __init__(self, sender, recipient, subject, msg):
+		self.sender = sender
+		self.recipient = recipient
+
+		# TODO: Add ref in recipient to this
+		# self.recipient.smails.append(self)
+
+		self.subject = subject
+		self.msg = msg
+
+
+
 def to_packet(content):
 	content_bytes = content.encode()
 	msg_len_bytes = struct.pack(msgconf.MSG_LEN_CHAR, len(content_bytes))
 	return msg_len_bytes + content_bytes
+
 
 
 """

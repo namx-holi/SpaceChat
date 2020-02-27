@@ -9,7 +9,7 @@ from app import (
 	user_manager
 )
 
-from app.models import Rover
+from objects.rover import Rover
 
 
 

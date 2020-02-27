@@ -50,6 +50,8 @@ def requires_token(func):
 
 
 
+# TODO: Make this also use kwargs! So people can do something like
+# `arg=int` to show that they have a desired type.
 def uses_fields(*fields):
 	"""
 	Decorator that checks if all required fields are present.

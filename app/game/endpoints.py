@@ -4,7 +4,7 @@ from app.game import bp
 
 from app.helpers import requires_token, uses_fields
 from app.helpers import direction_to_delta
-from app.models import SMail
+from managers.message_manager import SMail
 from app import message_manager, session_manager, user_manager
 
 
