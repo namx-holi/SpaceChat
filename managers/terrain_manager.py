@@ -1,4 +1,7 @@
 
+from config import TerrainConfig as terrconf
+
+
 
 class TerrainTile:
 

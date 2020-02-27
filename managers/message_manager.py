@@ -6,14 +6,7 @@ import socket
 import struct
 import threading
 
-
-MSG_LEN_CHAR = "I" # Represents an int
-MSG_LEN_BYTES = struct.calcsize(MSG_LEN_CHAR)
-
-HOST = "0.0.0.0"
-PORT = 7778
-
-MSG_CHECK_TIMEOUT = 0.25 # Seconds
+from config import MessageConfig as msgconf
 
 
 
@@ -70,7 +63,7 @@ class ServerMessage(Message):
 
 def to_packet(content):
 	content_bytes = content.encode()
-	msg_len_bytes = struct.pack(MSG_LEN_CHAR, len(content_bytes))
+	msg_len_bytes = struct.pack(msgconf.MSG_LEN_CHAR, len(content_bytes))
 	return msg_len_bytes + content_bytes
 
 
@@ -113,11 +106,11 @@ class MessageManager:
 		# Set up socket
 		server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-		server.bind((HOST, PORT))
+		server.bind((msgconf.HOST, msgconf.PORT))
 
 		# Start listening and handle connections
 		server.listen(self.conn_limit)
-		print(f" [*] Starting MessageManager on port {PORT}")
+		print(f" [*] Starting MessageManager on port {msgconf.PORT}")
 		self.listen_loop(server)
 
 		# Once done, close socket
@@ -153,7 +146,7 @@ class MessageManager:
 		while True:
 			# Check if a message to send
 			try:
-				msg = q.get(timeout=MSG_CHECK_TIMEOUT)
+				msg = q.get(timeout=msgconf.MSG_CHECK_TIMEOUT)
 			except queue.Empty:
 				# No message to send to the client!
 				pass
@@ -161,7 +154,7 @@ class MessageManager:
 				self._send(conn, session.user, msg)
 
 			# Try receive anything (could be an exit)
-			ready = select.select([conn], [], [], MSG_CHECK_TIMEOUT)
+			ready = select.select([conn], [], [], msgconf.MSG_CHECK_TIMEOUT)
 			if ready[0]:
 				raw = conn.recv(1024)
 

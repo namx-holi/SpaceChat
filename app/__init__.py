@@ -1,5 +1,5 @@
 from flask import Flask
-# from config import Config
+from config import AppConfig
 
 from managers.message_manager import MessageManager
 from managers.session_manager import SessionManager
@@ -15,10 +15,9 @@ user_manager = UserManager()
 message_manager = MessageManager(session_manager)
 
 
-# def create_app(config=Config):
-def create_app():
+def create_app(config=AppConfig):
 	app = Flask(__name__)
-	# app.config.from_object(config)
+	app.config.from_object(config)
 
 	# init app with managers
 

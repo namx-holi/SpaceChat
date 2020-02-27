@@ -1,5 +1,6 @@
-
 from app.models import User, Rover
+
+from config import UserConfig as userconf
 
 
 class UserManager:

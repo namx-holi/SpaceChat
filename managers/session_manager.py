@@ -1,15 +1,8 @@
 from datetime import datetime
 from uuid import uuid4
 
+from config import SessionConfig as sessconf
 
-"""
-# TODO: Instead of being required to refresh
-your token, each session should have a last
-token check time stored. Then we can check
-for inactivity of the player
-"""
-
-INACTIVITY_TIMEOUT_TIME = 30 # Minutes
 
 
 class Session:
@@ -39,7 +32,7 @@ class Session:
 	def timed_out(self):
 		delta = datetime.now() - self.last_active
 		# times 60 because inactivity timeout time is in minutes
-		return (delta.total_seconds() > INACTIVITY_TIMEOUT_TIME*60)
+		return (delta.total_seconds() > sessconf.INACTIVITY_TIMEOUT_TIME*60)
 
 
 	def update_last_active(self):
