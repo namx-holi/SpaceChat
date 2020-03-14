@@ -211,6 +211,11 @@ class MessageManager:
 			if msg.user == user or msg.recipient == user:
 				conn.send(msg.encode())
 
+		elif isinstance(msg, AlertMessage):
+			# Alerts are for just the recipient
+			if msg.recipient == user:
+				conn.send(msg.encode())
+
 		else:
 			# Not sure what this is! Send it anyway!
 			print("Unknown message type:", msg)
