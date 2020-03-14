@@ -168,18 +168,8 @@ def send_smail(session, recipient, subject, msg):
 			error="recipient does not exist"
 		)), 400
 
-	# TODO: Abstract sending smails to the message handler!
-
-	# Create SMail object and add to the recipients smail list
-	smail = SMail(
-		sender=session.user,
-		recipient=recipient,
-		subject=subject,
-		msg=msg)
-	recipient.smails.append(smail)
-
-	# Message to the recipient to notify they have a new message.
-	message_manager.send_alert(recipient, "You have a new SMAIL!")
+	# Send a smail!
+	message_manager.send_smail(session.user, recipient, subject, msg)
 
 	# Notify the user the SMail has sent successfuly!
 	return jsonify(dict(

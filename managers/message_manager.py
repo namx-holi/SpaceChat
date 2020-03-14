@@ -305,3 +305,16 @@ class MessageManager:
 		if not recipient_q:
 			raise Exception(f"recipient has no queue: {recipient}")
 		recipient_q.put(msg)
+
+
+	def send_smail(self, user, recipient, subject, msg):
+		# Create SMail object and add to the recipients smail list
+		smail = SMail(
+			sender=user,
+			recipient=recipient,
+			subject=subject,
+			msg=msg)
+		recipient.smails.append(smail)
+
+		# Message to the recipient to notify they have a new message.
+		self.send_alert(recipient, "You have a new SMAIL!")
