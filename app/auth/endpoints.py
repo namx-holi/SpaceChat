@@ -27,8 +27,8 @@ def register_user(username, password):
 	user = user_manager.create_user(username)
 	user.set_password(password)
 
-	# Add rover to default terrain
-	terrain_manager.add_object_to_default(user.rover)
+	# Set rover's terrain to default terrain
+	user.rover.terrain = terrain_manager.default_terrain
 
 	# Return success
 	return jsonify(dict(

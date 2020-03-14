@@ -57,8 +57,8 @@ class Terrain:
 
 
 	def add_object(self, obj, x, y):
-		print("Adding obj", obj, "at", x, y)
 		self.get_tile(x,y).add_object(obj)
+		obj.terrain = self
 
 
 	def remove_object(self, obj):

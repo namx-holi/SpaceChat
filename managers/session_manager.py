@@ -21,12 +21,15 @@ class Session:
 		# Last active on session create
 		self.last_active = datetime.now()
 
-		# TODO: Add rover back to last loc
+		# Show rover
+		self.rover.show()
 
 
 	def close(self):
 		self.manager.remove_session(self)
-		# TODO: Remove rover from loc
+
+		# Hide rover
+		self.rover.hide()
 
 
 	def timed_out(self):
