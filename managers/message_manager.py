@@ -316,5 +316,7 @@ class MessageManager:
 			msg=msg)
 		recipient.smails.append(smail)
 
-		# Message to the recipient to notify they have a new message.
-		self.send_alert(recipient, "You have a new SMAIL!")
+		# Message to the recipient to notify they have a new message
+		# if they are logged in.
+		if recipient.session:
+			self.send_alert(recipient, "You have a new SMAIL!")

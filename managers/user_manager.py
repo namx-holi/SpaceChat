@@ -12,6 +12,7 @@ class User:
 		self.rover = None
 		self.notes = set()
 		self.smails = []
+		self.session = None
 
 
 	def set_password(self, password):
