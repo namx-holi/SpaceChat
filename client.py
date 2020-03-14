@@ -67,6 +67,10 @@ class Client:
 
 
 	def handle(self, user_input):
+		# Ignore empty input
+		if user_input.strip() == "":
+			return
+
 		action, _, args = user_input.partition(" ")
 		args = args.strip().split(" ")
 		if action == "help":
@@ -155,7 +159,7 @@ class Client:
 			ready = select.select([self.broadcast_conn], [], [], 0.25)
 			if ready[0]:
 				resp = read_broadcast_packet(self.broadcast_conn)
-				print(resp)
+				print("Received message:", resp)
 
 		self.broadcast_conn.send("EXIT".encode())
 		self.broadcast_conn.close()

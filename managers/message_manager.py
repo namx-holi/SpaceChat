@@ -14,9 +14,11 @@ class Message:
 	@property
 	def content(self):
 		return dict(
+			type=self.type,
 			msg=self.msg)
 	def __init__(self, msg):
 		self.msg = msg
+		self.type = "generic"
 	def encode(self):
 		data = json.dumps(self.content)
 		return to_packet(data)
@@ -26,10 +28,12 @@ class UserMessage(Message):
 	@property
 	def content(self):
 		return dict(
+			type=self.type,
 			username=self.user.username,
 			msg=self.msg)
 	def __init__(self, user, msg):
 		super().__init__(msg)
+		self.type = "user"
 		self.user = user
 	def __repr__(self):
 		return f"<UserMessage '{self.user.name}: {self.msg}'>"
@@ -37,11 +41,13 @@ class WhisperMessage(Message):
 	@property
 	def content(self):
 		return dict(
+			type=self.type,
 			username=self.user.username,
 			recipient=self.recipient.username,
 			msg=self.msg)
 	def __init__(self, user, recipient, msg):
 		super().__init__(msg)
+		self.type = "whisper"
 		self.user = user
 		self.recipient = recipient
 	def __repr__(self):
@@ -50,8 +56,16 @@ class WhisperMessage(Message):
 class ServerMessage(Message):
 	def __init__(self, msg):
 		super().__init__(msg)
+		self.type = "server"
 	def __repr__(self):
 		return f"<ServerMessage '{self.msg}'>"
+class AlertMessage(Message):
+	def __init__(self, recipient, msg):
+		super().__init__(msg)
+		self.type = "alert"
+		self.recipient = recipient
+	def __repr__(self):
+		return f"<AlertMessage '{self.msg}'>"
 
 
 
@@ -276,3 +290,13 @@ class MessageManager:
 		# Server message is for all users logged in.
 		for q in self.client_queues:
 			q.put(msg)
+
+
+	def send_alert(self, recipient, msg):
+		msg = AlertMessage(recipient, msg)
+
+		# Get the recipient's queue and add
+		recipient_q = self.user_to_queue_map.get(recipient, None)
+		if not recipient_q:
+			raise Exception(f"recipient has no queue: {recipient}")
+		recipient_q.put(msg)
