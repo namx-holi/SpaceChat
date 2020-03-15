@@ -1,5 +1,5 @@
 from flask import Flask
-# from config import Config
+from config import AppConfig
 
 from managers.message_manager import MessageManager
 from managers.session_manager import SessionManager
@@ -15,16 +15,17 @@ user_manager = UserManager()
 message_manager = MessageManager(session_manager)
 
 
-# def create_app(config=Config):
-def create_app():
+def create_app(config=AppConfig):
 	app = Flask(__name__)
-	# app.config.from_object(config)
+	app.config.from_object(config)
 
 	# init app with managers
 
 	# Blueprint registration
 	from app.auth import bp as auth_bp
 	app.register_blueprint(auth_bp)
+	from app.communication import bp as comm_bp
+	app.register_blueprint(comm_bp)
 	from app.game import bp as game_bp
 	app.register_blueprint(game_bp)
 

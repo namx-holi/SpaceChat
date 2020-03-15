@@ -17,7 +17,11 @@ BROADCAST_PORT = 7778
 def make_request(endpoint, data):
 	url = f"{BASE_API_URL}/{endpoint}"
 	r = requests.post(url=url, json=data)
-	resp = r.json()
+	try:
+		resp = r.json()
+	except Exception as e:
+		print(r.text)
+		raise e
 	print(resp)
 	print("")
 	return resp
@@ -63,6 +67,10 @@ class Client:
 
 
 	def handle(self, user_input):
+		# Ignore empty input
+		if user_input.strip() == "":
+			return
+
 		action, _, args = user_input.partition(" ")
 		args = args.strip().split(" ")
 		if action == "help":
@@ -96,6 +104,39 @@ class Client:
 		elif action == "message":
 			msg = " ".join(args)
 			self.message(msg)
+
+		elif action == "whisper":
+			recipient = args[0]
+			msg = " ".join(args[1:])
+			self.whisper(recipient, msg)
+
+		elif action == "send-smail":
+			recipient = args[0]
+			subject_and_content = " ".join(args[1:])
+			subject, _, msg = subject_and_content.partition("|")
+			self.send_smail(recipient, subject, msg)
+
+		elif action == "check-smail":
+			self.check_smail()
+
+		elif action == "read-smail":
+			smail_id = args[0]
+			self.read_smail(smail_id)
+
+		elif action == "delete-smail":
+			smail_id = args[0]
+			self.delete_smail(smail_id)
+
+		elif action == "add-friend":
+			user = args[0]
+			self.add_friend(user)
+
+		elif action == "remove-friend":
+			user = args[0]
+			self.remove_friend(user)
+
+		elif action == "view-friends":
+			self.view_friends()
 
 		elif action == "logout":
 			self.logout()
@@ -133,7 +174,7 @@ class Client:
 			ready = select.select([self.broadcast_conn], [], [], 0.25)
 			if ready[0]:
 				resp = read_broadcast_packet(self.broadcast_conn)
-				print(resp)
+				print("Received message:", resp)
 
 		self.broadcast_conn.send("EXIT".encode())
 		self.broadcast_conn.close()
@@ -141,26 +182,12 @@ class Client:
 
 
 	def help(self):
-		data = dict()
-		resp = make_request("help", data)
-
-		print("Keys:", resp.keys())
-		print("Sorted keys:", sorted(resp.keys()))
-
-		for command in sorted(resp.keys()):
-			desc = resp[command]["desc"]
-			args = resp[command]["args"]
-			requires_token = resp[command]["requires_token"]
-
-			print("{}{}{}".format(
-				command,
-				"" if not args else " " + " ".join(args),
-				"" if not requires_token else " (requires token)"
-			))
-			print(f"  - {desc}")
-
-
-		# TODO: Display help in a nice way.
+		# TODO: Write a help message for commands
+		# The reason this will become client-fat is
+		# because the client will eventually pivot to
+		# a UI where only the api requests will be
+		# sent without the need for manual commands
+		print("STUB: Help message. Oops!")
 
 
 	def register(self, username, password):
@@ -169,6 +196,9 @@ class Client:
 
 
 	def login(self, username, password):
+		if self.logged_in:
+			self.logout()
+
 		data = dict(username=username, password=password)
 		resp = make_request("login", data)
 		self.token = resp.get("token", None)
@@ -202,6 +232,47 @@ class Client:
 	def message(self, msg):
 		data = dict(token=self.token, msg=msg)
 		resp = make_request("message", data)
+
+
+	def whisper(self, recipient, msg):
+		data = dict(token=self.token, recipient=recipient, msg=msg)
+		resp = make_request("whisper", data)
+
+
+	def send_smail(self, recipient, subject, msg):
+		data = dict(token=self.token,
+			recipient=recipient, subject=subject, msg=msg)
+		resp = make_request("send-smail", data)
+
+
+	def check_smail(self):
+		data = dict(token=self.token)
+		resp = make_request("check-smail", data)
+
+
+	def read_smail(self, smail_id):
+		data = dict(token=self.token, smail_id=smail_id)
+		resp = make_request("read-smail", data)
+
+
+	def delete_smail(self, smail_id):
+		data = dict(token=self.token, smail_id=smail_id)
+		resp = make_request("delete-smail", data)
+
+
+	def add_friend(self, user):
+		data = dict(token=self.token, user=user)
+		resp = make_request("add-friend", data)
+
+
+	def remove_friend(self, user):
+		data = dict(token=self.token, user=user)
+		resp = make_request("remove-friend", data)
+
+
+	def view_friends(self):
+		data = dict(token=self.token)
+		resp = make_request("view-friends", data)
 
 
 	def logout(self):

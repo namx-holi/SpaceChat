@@ -1,6 +1,12 @@
 
+from config import TerrainConfig as terrconf
+
+
 
 class TerrainTile:
+
+	# TODO: Keep track of users that are on the terrain
+	# This could be done by registering them?
 
 	def __init__(self, terrain, x, y):
 		self.terrain = terrain
@@ -51,8 +57,8 @@ class Terrain:
 
 
 	def add_object(self, obj, x, y):
-		print("Adding obj", obj, "at", x, y)
 		self.get_tile(x,y).add_object(obj)
+		obj.terrain = self
 
 
 	def remove_object(self, obj):

@@ -5,8 +5,6 @@ from app.game import bp
 from app.helpers import requires_token, uses_fields
 from app.helpers import direction_to_delta
 
-from app import message_manager
-
 
 @bp.route("/api/move", methods=["POST"])
 @requires_token
@@ -88,24 +86,4 @@ def inspect(session, direction):
 	return jsonify(dict(
 		msg=f"inspecting {direction.title()}",
 		objs=content
-	)), 200
-
-
-@bp.route("/api/message", methods=["POST"])
-@requires_token
-@uses_fields("msg")
-def send_message(session, msg):
-
-	# Check if msg length is under 200 characters
-	if len(msg) > 200:
-		return jsonify(dict(
-			error="msg must be under 200 characters"
-		)), 400
-
-	# Add message to message manager
-	message_manager.send_message(session.user, msg)
-
-	# Return success
-	return jsonify(dict(
-		msg="message sent"
 	)), 200

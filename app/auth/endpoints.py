@@ -9,7 +9,7 @@ from app import (
 	user_manager
 )
 
-from app.models import Rover
+from objects.rover import Rover
 
 
 
@@ -27,8 +27,8 @@ def register_user(username, password):
 	user = user_manager.create_user(username)
 	user.set_password(password)
 
-	# Add rover to default terrain
-	terrain_manager.add_object_to_default(user.rover)
+	# Set rover's terrain to default terrain
+	user.rover.terrain = terrain_manager.default_terrain
 
 	# Return success
 	return jsonify(dict(
@@ -55,9 +55,8 @@ def login_user(username, password):
 
 	# Check if session exists. If so,
 	# Invalidate old token and remove session
-	session = session_manager.get_by_user(user)
-	if session:
-		session.close()
+	if user.session:
+		user.session.close()
 
 	# Create new session for user
 	session = session_manager.create_session(user)

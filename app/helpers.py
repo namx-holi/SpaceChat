@@ -3,6 +3,8 @@ from flask import request, jsonify
 import functools
 from app import session_manager
 
+from config import SessionConfig as sessconf
+
 
 def requires_token(func):
 	"""
@@ -31,12 +33,25 @@ def requires_token(func):
 				error="invalid token"
 			)), 400
 
+		# Check if the session has timed out due to inactivity
+		if session.timed_out():
+			session.close()
+			return jsonify(dict(
+				error="session timed out (inactive for {} minutes)".format(
+					sessconf.INACTIVITY_TIMEOUT_TIME)
+			)), 400
+
+		# Update the last active time
+		session.update_last_active()
+
 		# Call the original func
 		return func(session, *args, **kwargs)
 	return inner
 
 
 
+# TODO: Make this also use kwargs! So people can do something like
+# `arg=int` to show that they have a desired type.
 def uses_fields(*fields):
 	"""
 	Decorator that checks if all required fields are present.
