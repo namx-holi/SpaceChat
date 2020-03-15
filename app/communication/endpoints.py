@@ -99,19 +99,22 @@ def check_smail(session):
 	# Check if user has any SMails
 	if not session.user.smails:
 		return jsonify(dict(
-			msg="your SMail inbox is empty"
+			msg="your SMail inbox is empty",
+			smails=[]
 		)), 200
 
 	# Get all the subjects along with a number
-	smails = session.user.smails
-	subject_lines = [
-		f"{smail_num+1}) {smail.subject}"
-		for smail_num, smail in enumerate(smails)]
+	smail_info = [
+		dict(
+			id=smail_num+1,
+			sender=smail.sender.username,
+			subject=smail.subject
+		) for smail_num, smail in enumerate(session.user.smails)]
 
 	# Return the subjects of all SMails
 	return jsonify(dict(
-		msg=f"you have {len(smails)} SMails",
-		subject_lines=subject_lines
+		msg=f"you have {len(smail_info)} SMails",
+		smails=smail_info
 	)), 200
 
 
@@ -246,42 +249,31 @@ def view_friends(session):
 	# Check if user has any friends
 	if not session.user.friends:
 		return jsonify(dict(
-			msg="your friends list is empty"
+			msg="your friends list is empty",
+			friends=[]
 		)), 200
 
-	status_num_to_str = {
-		-1: "this user must add you as a friend",
-		0: "offline",
-		1: "online"
-	}
-
-	# Get all the users along with a number
-	# Also count how many users are online
-	users = session.user.friends
-	status_and_user = []
+	# Get all friends along with online status
+	# Count online users too
+	friends_info = []
 	online_count = 0
-	for user in sorted(users, key=lambda user:user.username):
-		# Only show user online status if mutual friends
-		if session.user in user.friends:
-			if user.session:
-				online_status = 1 #"Online"
-				online_count += 1
-			else:
-				online_status = 0 #"Offline"
+	for friend in session.user.friends:
+		# Only give status if mutual friends
+		if session.user in friend.friends:
+			online = (friend.session is not None)
 		else:
-			online_status = -1 #"this user must add you as a friend"
+			online = None
 
-		status_and_user.append((online_status, user.username))
+		if online:
+			online_count += 1
 
-	# Sort users by online status and turn status into string
-	user_lines = [
-		f"{username} ({status_num_to_str[status]})"
-		for status, username in sorted(status_and_user)]
-
-	print(user_lines)
+		friends_info.append(dict(
+			username=friend.username,
+			online=online
+		))
 
 	# Return the friends list
 	return jsonify(dict(
 		msg=f"you have {online_count} friends online",
-		friend_lines=user_lines
+		friends=friends_info
 	)), 200

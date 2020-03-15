@@ -133,7 +133,7 @@ class Client:
 
 		elif action == "remove-friend":
 			user = args[0]
-			self.remove_user(user)
+			self.remove_friend(user)
 
 		elif action == "view-friends":
 			self.view_friends()
