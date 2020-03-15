@@ -123,6 +123,10 @@ class Client:
 			smail_id = args[0]
 			self.read_smail(smail_id)
 
+		elif action == "delete-smail":
+			smail_id = args[0]
+			self.delete_smail(smail_id)
+
 		elif action == "logout":
 			self.logout()
 
@@ -238,6 +242,11 @@ class Client:
 	def read_smail(self, smail_id):
 		data = dict(token=self.token, smail_id=smail_id)
 		resp = make_request("read-smail", data)
+
+
+	def delete_smail(self, smail_id):
+		data = dict(token=self.token, smail_id=smail_id)
+		resp = make_request("delete-smail", data)
 
 
 	def logout(self):

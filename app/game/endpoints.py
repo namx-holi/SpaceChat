@@ -226,3 +226,29 @@ def read_smail(session, smail_id):
 		subject=smail.subject,
 		msg=smail.msg
 	)), 200
+
+
+@bp.route("/api/delete-smail", methods=["POST"])
+@requires_token
+@uses_fields("smail_id")
+def delete_smail(session, smail_id):
+
+	# Try turn the smail_id into a number
+	if not smail_id.isnumeric():
+		return jsonify(dict(
+			error="smail_id must be a number"
+		)), 400
+	smail_id = int(smail_id)
+
+	# Check if the SMail id is valid
+	smails = session.user.smails
+	if smail_id <= 0 or smail_id > len(smails):
+		return jsonify(dict(
+			error="invalid smail_id"
+		)), 400
+
+	# Pop the smail and return success
+	_ = smails.pop(smail_id-1) # -1 for index
+	return jsonify(dict(
+		msg="SMail deleted"
+	)), 200
