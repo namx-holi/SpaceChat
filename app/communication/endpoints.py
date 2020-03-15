@@ -167,3 +167,121 @@ def delete_smail(session, smail_id):
 	return jsonify(dict(
 		msg="SMail deleted"
 	)), 200
+
+
+@bp.route("/api/add-friend", methods=["POST"])
+@requires_token
+@uses_fields("user")
+def add_friend(session, user):
+
+	# Check if the user exists
+	user = user_manager.get_by_name(user)
+	if not user:
+		return jsonify(dict(
+			error="user does not exist"
+		)), 400
+
+	# Check if user is self. That doesn't make sense!
+	if user == session.user:
+		return jsonify(dict(
+			error="cannot add self as friend"
+		)), 400
+
+	# Check if user is already a friend
+	if user in session.user.friends:
+		return jsonify(dict(
+			error="user already on friend list"
+		)), 400
+
+	# Send an alert to the user if they are logged in
+	if user.session:
+		message_manager.send_alert(user,
+			f"{session.user.username} has added you as a friend")
+
+	# Add the recipient to the users friend list
+	session.user.friends.add(user)
+
+	# Return success
+	return jsonify(dict(
+		msg=f"{user.username} added to friends list"
+	)), 200
+
+
+@bp.route("/api/remove-friend", methods=["POST"])
+@requires_token
+@uses_fields("user")
+def remove_friend(session, user):
+
+	# Check if the user exists
+	user = user_manager.get_by_name(user)
+	if not user:
+		return jsonify(dict(
+			error="user does not exist"
+		)), 400
+
+	# Check if user is in friend list
+	if user not in session.user.friends:
+		return jsonify(dict(
+			error="user not in friends list"
+		)), 400
+
+	# NOTE: Do not send an alert for the user being
+	# removed as a friend!
+
+	# Remove the user from friends list
+	session.user.friends.remove(user)
+
+	# Return success
+	return jsonify(dict(
+		msg=f"{user.username} removed from friends list"
+	)), 200
+
+
+@bp.route("/api/view-friends", methods=["POST"])
+@requires_token
+def view_friends(session):
+
+	print("Doing a thing")
+
+	# Check if user has any friends
+	if not session.user.friends:
+		return jsonify(dict(
+			msg="your friends list is empty"
+		)), 200
+
+	status_num_to_str = {
+		-1: "this user must add you as a friend",
+		0: "offline",
+		1: "online"
+	}
+
+	# Get all the users along with a number
+	# Also count how many users are online
+	users = session.user.friends
+	status_and_user = []
+	online_count = 0
+	for user in sorted(users, key=lambda user:user.username):
+		# Only show user online status if mutual friends
+		if session.user in user.friends:
+			if user.session:
+				online_status = 1 #"Online"
+				online_count += 1
+			else:
+				online_status = 0 #"Offline"
+		else:
+			online_status = -1 #"this user must add you as a friend"
+
+		status_and_user.append((online_status, user.username))
+
+	# Sort users by online status and turn status into string
+	user_lines = [
+		f"{username} ({status_num_to_str[status]})"
+		for status, username in sorted(status_and_user)]
+
+	print(user_lines)
+
+	# Return the friends list
+	return jsonify(dict(
+		msg=f"you have {online_count} friends online",
+		friend_lines=user_lines
+	)), 200

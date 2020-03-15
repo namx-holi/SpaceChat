@@ -13,6 +13,7 @@ class User:
 		self.notes = set()
 		self.smails = []
 		self.session = None
+		self.friends = set()
 
 
 	def set_password(self, password):

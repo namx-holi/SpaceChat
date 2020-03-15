@@ -127,6 +127,17 @@ class Client:
 			smail_id = args[0]
 			self.delete_smail(smail_id)
 
+		elif action == "add-friend":
+			user = args[0]
+			self.add_friend(user)
+
+		elif action == "remove-friend":
+			user = args[0]
+			self.remove_user(user)
+
+		elif action == "view-friends":
+			self.view_friends()
+
 		elif action == "logout":
 			self.logout()
 
@@ -247,6 +258,21 @@ class Client:
 	def delete_smail(self, smail_id):
 		data = dict(token=self.token, smail_id=smail_id)
 		resp = make_request("delete-smail", data)
+
+
+	def add_friend(self, user):
+		data = dict(token=self.token, user=user)
+		resp = make_request("add-friend", data)
+
+
+	def remove_friend(self, user):
+		data = dict(token=self.token, user=user)
+		resp = make_request("remove-friend", data)
+
+
+	def view_friends(self):
+		data = dict(token=self.token)
+		resp = make_request("view-friends", data)
 
 
 	def logout(self):
