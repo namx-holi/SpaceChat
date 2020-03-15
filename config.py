@@ -13,6 +13,7 @@ class MessageConfig:
 	PORT = 7778
 
 	MSG_CHECK_TIMEOUT = 0.25
+	CONN_LIMIT = 20
 
 
 class SessionConfig:

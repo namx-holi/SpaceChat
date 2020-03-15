@@ -90,6 +90,21 @@ def to_packet(content):
 
 
 """
+TODO: Remove references of the user manager from this class.
+Instead of storing queue per session, store it by a user given to
+us when it's registered. Add for the session which we can get through
+the user to this message manager, so we can call unregister from
+the session from the message manager.
+
+This will make the session manager a bit nicer too.
+Also it will allow us to send a message to a user through the user,
+but before incorperating this, it is a good idea to have a long think
+about the architecture of this project.
+"""
+
+
+
+"""
 TODO: A class that manages all the connections.
 
 It will have a socket that players can connect to.
@@ -113,7 +128,9 @@ class MessageManager:
 
 	def __init__(self, session_manager, **kwargs):
 		self.session_manager = session_manager
-		self.conn_limit = kwargs.get("conn_limit", 20)
+		session_manager.message_manager = self
+
+		self.conn_limit = kwargs.get("conn_limit", msgconf.CONN_LIMIT)
 
 		# Used to look up the connection from a user
 		self.user_to_queue_map = dict()
@@ -319,4 +336,4 @@ class MessageManager:
 		# Message to the recipient to notify they have a new message
 		# if they are logged in.
 		if recipient.session:
-			self.send_alert(recipient, "You have a new SMAIL!")
+			self.send_alert(recipient, "You have a new SMail!")

@@ -24,8 +24,20 @@ class Session:
 		# Show rover
 		self.rover.show()
 
+		# Send online mutual friends a login alert!
+		for friend in self.user.friends:
+			if self.user in friend.friends and friend.session is not None:
+				self.manager.message_manager.send_alert(friend,
+					f"{self.user.username} logged in!")
+
 
 	def close(self):
+		# Send online mutual friends a logout alert!
+		for friend in self.user.friends:
+			if self.user in friend.friends and friend.session is not None:
+				self.manager.message_manager.send_alert(friend,
+					f"{self.user.username} logged out.")
+
 		self.manager.remove_session(self)
 
 		# Hide rover
