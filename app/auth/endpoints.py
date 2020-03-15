@@ -55,9 +55,8 @@ def login_user(username, password):
 
 	# Check if session exists. If so,
 	# Invalidate old token and remove session
-	session = session_manager.get_by_user(user)
-	if session:
-		session.close()
+	if user.session:
+		user.session.close()
 
 	# Create new session for user
 	session = session_manager.create_session(user)
