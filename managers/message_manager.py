@@ -10,7 +10,7 @@ from config import MessageConfig as msgconf
 
 
 
-class Message:
+class Message: # type == generic
 	@property
 	def content(self):
 		return dict(
@@ -24,7 +24,7 @@ class Message:
 		return to_packet(data)
 	def __repr__(self):
 		return f"<Message '{self.msg}'>"
-class UserMessage(Message):
+class UserMessage(Message): # type == user
 	@property
 	def content(self):
 		return dict(
@@ -37,7 +37,7 @@ class UserMessage(Message):
 		self.user = user
 	def __repr__(self):
 		return f"<UserMessage '{self.user.name}: {self.msg}'>"
-class WhisperMessage(Message):
+class WhisperMessage(Message): # type == whisper
 	@property
 	def content(self):
 		return dict(
@@ -53,13 +53,13 @@ class WhisperMessage(Message):
 	def __repr__(self):
 		return "<WhisperMessage to {}: '{}: {}'>".format(
 			self.recipient.name, self.user.name, self.msg)
-class ServerMessage(Message):
+class ServerMessage(Message): # type == server
 	def __init__(self, msg):
 		super().__init__(msg)
 		self.type = "server"
 	def __repr__(self):
 		return f"<ServerMessage '{self.msg}'>"
-class AlertMessage(Message):
+class AlertMessage(Message): # type == alert
 	def __init__(self, recipient, msg):
 		super().__init__(msg)
 		self.type = "alert"
